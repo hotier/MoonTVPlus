@@ -6,6 +6,9 @@ import { badRequest, getMusicV2Username, internalError, unauthorized } from '@/l
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 export async function GET(request: NextRequest) {
   const username = await getMusicV2Username(request);
   if (!username) return unauthorized();

@@ -4,6 +4,9 @@ import { verifyOidcSession } from '@/lib/oidc-session';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 export async function GET(request: NextRequest) {
   try {
     const oidcSessionCookie = request.cookies.get('oidc_session')?.value;

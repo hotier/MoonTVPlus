@@ -8,6 +8,9 @@ import { getTMDBImages } from '@/lib/tmdb.client';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 /**
  * GET /api/tmdb/images?id=xxx&type=movie|tv&page=1&pageSize=24
  * 获取 TMDB 照片墙数据，并在服务端分页

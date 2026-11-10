@@ -6,6 +6,9 @@ import { getAuthInfoFromCookie } from '@/lib/auth';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 /**
  * GET /api/watch-room-auth
  *

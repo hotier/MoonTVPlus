@@ -11,6 +11,9 @@ import { AnimeSubscription } from '@/types/anime-subscription';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 /**
  * GET /api/admin/anime-subscription
  * 获取订阅列表和配置

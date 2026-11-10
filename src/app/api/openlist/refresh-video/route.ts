@@ -10,6 +10,9 @@ import { invalidateVideoInfoCache } from '@/lib/openlist-cache';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 /**
  * POST /api/openlist/refresh-video
  * 刷新单个视频的 videoinfo.json

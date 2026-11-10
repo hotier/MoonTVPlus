@@ -20,6 +20,9 @@ import { getTMDBImageUrl } from '@/lib/tmdb.search';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 /**
  * GET /api/openlist/list?page=1&pageSize=20&includeFailed=false&noCache=false&category=
  * 获取私人影库视频列表

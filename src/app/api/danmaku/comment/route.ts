@@ -6,6 +6,9 @@ import { getDanmakuApiBaseUrl } from '@/lib/danmaku/config';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 // 解析弹幕 XML 为 JSON
 function parseXmlDanmaku(xmlText: string): Array<{ p: string; m: string; cid: number }> {
   const comments: Array<{ p: string; m: string; cid: number }> = [];

@@ -7,6 +7,9 @@ import { searchACG } from '@/lib/anime-subscription';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 /**
  * POST /api/admin/anime-subscription/recognize
  * 智能识别：按番剧名搜索一次，对结果做「字幕组 × 字幕形态」分组

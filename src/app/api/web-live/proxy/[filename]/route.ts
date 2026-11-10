@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { requireFeaturePermission } from '@/lib/permissions';
 
+export const dynamic = 'force-dynamic';
+
+
 function getBaseUrl(url: string): string {
   const urlObj = new URL(url);
   const pathParts = urlObj.pathname.split('/');

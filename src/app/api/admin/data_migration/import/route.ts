@@ -12,6 +12,9 @@ import { updateProgress, clearProgress } from '@/lib/data-migration-progress';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 const gunzipAsync = promisify(gunzip);
 
 export async function POST(req: NextRequest) {

@@ -15,6 +15,9 @@ import {
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 /**
  * POST /api/openlist/correct
  * 纠正视频的TMDB映射

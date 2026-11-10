@@ -5,6 +5,9 @@ import { getSuwayomiConfig, loginWithSimpleAuth } from '@/lib/suwayomi.client';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 function resolveUpstreamUrl(serverBaseUrl: string, pathOrUrl: string): string {
   if (/^https?:\/\//i.test(pathOrUrl)) {
     const target = new URL(pathOrUrl);

@@ -5,6 +5,9 @@ import { getConfig } from '@/lib/config';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 export async function GET(request: NextRequest) {
   try {
     const config = await getConfig();

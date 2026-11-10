@@ -4,6 +4,9 @@ import { fetchDoubanData } from '@/lib/douban';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 interface DoubanSearchResult {
   id: string;
   title: string;

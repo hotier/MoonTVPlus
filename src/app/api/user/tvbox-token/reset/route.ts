@@ -6,6 +6,9 @@ import { generateTvboxToken } from '@/lib/tvbox-token';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 /**
  * 重置用户的TVBox订阅token
  * 旧token将失效

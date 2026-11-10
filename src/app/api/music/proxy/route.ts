@@ -5,6 +5,9 @@ import { requireFeaturePermission } from '@/lib/permissions';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 // 代理音频流
 export async function GET(request: NextRequest) {
   try {

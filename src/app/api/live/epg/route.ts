@@ -5,6 +5,9 @@ import { requireFeaturePermission } from '@/lib/permissions';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 export async function GET(request: NextRequest) {
   try {
     const authResult = await requireFeaturePermission(request, 'live', '无权限访问电视直播');

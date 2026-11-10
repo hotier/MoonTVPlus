@@ -6,6 +6,9 @@ import { getAuthorizedUsername } from '../../_utils';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 function sse(data: unknown): string {
   return `data: ${JSON.stringify(data)}\n\n`;
 }

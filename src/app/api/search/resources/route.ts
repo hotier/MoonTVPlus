@@ -7,6 +7,9 @@ import { listEnabledSourceScripts } from '@/lib/source-script';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 // OrionTV 兼容接口
 export async function GET(request: NextRequest) {
   console.log('request', request.url);

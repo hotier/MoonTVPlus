@@ -8,6 +8,9 @@ import { getTVSeasons } from '@/lib/tmdb.search';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 /**
  * GET /api/tmdb/seasons?tvId=xxx
  * 获取电视剧的季度列表

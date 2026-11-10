@@ -10,6 +10,9 @@ import { cleanHtmlTags } from '@/lib/utils';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 interface CmsVideoItem {
   vod_id: string | number;
   vod_name: string;

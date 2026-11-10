@@ -12,6 +12,9 @@ import { hasFeaturePermission } from '@/lib/permissions';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 /**
  * GET /api/openlist/play/{token}?folder=xxx&fileName=xxx
  * 获取单个视频文件的播放链接（懒加载）

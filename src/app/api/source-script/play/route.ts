@@ -8,6 +8,9 @@ import {
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 /**
  * GET /api/source-script/play?key=xxx&sourceId=xxx&episodeIndex=0&playUrl=base64url&format=json
  * format=json: 返回 JSON 格式（用于 play 页面）

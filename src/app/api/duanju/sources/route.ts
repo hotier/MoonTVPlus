@@ -7,6 +7,9 @@ import { getDuanjuSources } from '@/lib/duanju';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 /**
  * 获取包含短剧分类的视频源列表
  */

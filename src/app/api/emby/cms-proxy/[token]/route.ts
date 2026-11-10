@@ -8,6 +8,9 @@ import { hasFeaturePermission } from '@/lib/permissions';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 /**
  * Emby CMS 代理接口（动态路由）
  * 将 Emby 媒体库转换为 TVBox 兼容的 CMS API 格式

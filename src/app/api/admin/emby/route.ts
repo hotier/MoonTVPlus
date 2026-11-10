@@ -10,6 +10,9 @@ import { clearEmbyCache } from '@/lib/emby-cache';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 /**
  * POST /api/admin/emby
  * Emby 配置管理接口

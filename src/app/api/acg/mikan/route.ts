@@ -9,6 +9,9 @@ import { hasFeaturePermission } from '@/lib/permissions';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 const pickText = (value: any): string => {
   if (value === undefined || value === null) return '';
   const first = Array.isArray(value) ? value[0] : value;

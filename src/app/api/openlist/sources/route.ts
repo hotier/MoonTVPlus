@@ -8,6 +8,9 @@ import { requireFeaturePermission } from '@/lib/permissions';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 /**
  * GET /api/openlist/sources
  * 返回可选的 OpenList 源名列表（主源在前），供「存到私人影库」弹窗选择。

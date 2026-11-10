@@ -9,6 +9,9 @@ import { hasFeaturePermission } from '@/lib/permissions';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 /**
  * TVBOX订阅API
  * 根据视频源和直播源生成TVBOX订阅

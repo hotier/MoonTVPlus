@@ -9,6 +9,9 @@ import { startOpenListRefresh } from '@/lib/openlist-refresh';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 /**
  * POST /api/openlist/refresh
  * 刷新私人影库元数据（后台任务模式）

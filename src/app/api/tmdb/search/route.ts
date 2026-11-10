@@ -8,6 +8,9 @@ import { searchTMDBMulti } from '@/lib/tmdb.client';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 /**
  * GET /api/tmdb/search?query=xxx
  * 搜索TMDB，返回多个结果供用户选择

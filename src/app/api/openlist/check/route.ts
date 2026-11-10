@@ -8,6 +8,9 @@ import { OpenListClient } from '@/lib/openlist.client';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 /**
  * POST /api/openlist/check
  * 检查 OpenList 连通性

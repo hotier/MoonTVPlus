@@ -21,6 +21,9 @@ import {
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 /**
  * GET /api/openlist/detail?folder=xxx
  * 获取视频文件夹的详细信息

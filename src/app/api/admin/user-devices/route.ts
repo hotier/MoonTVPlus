@@ -13,6 +13,9 @@ import {
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 async function getOperatorRole(username: string): Promise<'owner' | 'admin' | 'user'> {
   if (username === process.env.USERNAME) return 'owner';
 

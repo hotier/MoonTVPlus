@@ -16,6 +16,9 @@ import { requireFeaturePermission } from '@/lib/permissions';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 /**
  * 使用 HEAD 请求跟随重定向获取最终 URL（直连方法 - 降级使用）
  * HEAD 不支持（405/501）或请求异常时，降级使用普通 GET（无 Range）让 fetch 跟随重定向

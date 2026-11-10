@@ -8,6 +8,9 @@ import { getConfig } from '@/lib/config';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 function isCloudflareEnvironment(): boolean {
   return (
     process.env.CF_PAGES === '1' || process.env.BUILD_TARGET === 'cloudflare'

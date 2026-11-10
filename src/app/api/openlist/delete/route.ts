@@ -14,6 +14,9 @@ import {
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 /**
  * POST /api/openlist/delete
  * 删除私人影库中的视频记录

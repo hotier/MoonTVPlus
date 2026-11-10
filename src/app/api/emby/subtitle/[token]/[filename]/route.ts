@@ -8,6 +8,9 @@ import { hasFeaturePermission } from '@/lib/permissions';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 async function getEmbyClient(embyKey?: string) {
   const config = await getConfig();
 

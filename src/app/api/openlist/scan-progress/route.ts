@@ -8,6 +8,9 @@ import { getScanTask } from '@/lib/scan-task';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 /**
  * GET /api/openlist/scan-progress?taskId=xxx
  * 获取扫描任务进度

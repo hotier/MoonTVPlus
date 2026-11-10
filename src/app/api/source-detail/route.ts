@@ -70,6 +70,9 @@ import {
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 /**
  * 解析站点 origin。
  * 优先级：SITE_BASE（站点 url 环境变量）> NEXT_PUBLIC_SITE_URL > 请求头 Host。
