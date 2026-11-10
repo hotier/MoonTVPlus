@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { AdminConfigResult } from '@/lib/admin.types';
 import { getAuthInfoFromCookie } from '@/lib/auth';
 import { getConfig } from '@/lib/config';
+import { bumpLayoutCacheVersion } from '@/lib/layout-cache';
 import { syncTVBoxLiveSources } from '@/lib/tvbox-live.server';
 
 export const runtime = 'nodejs';
@@ -112,6 +113,9 @@ export async function POST(request: NextRequest) {
 
     // 更新缓存
     await setCachedConfig(checkedConfig);
+
+    // 布局聚合缓存失效：让配置改动立即反映到下一次页面导航
+    bumpLayoutCacheVersion();
 
     return NextResponse.json({ success: true, message: '配置已保存' });
   } catch (error) {
