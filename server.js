@@ -1,6 +1,22 @@
 // Next.js 自定义服务器 + Socket.IO
 const { createServer } = require('http');
 const { parse } = require('url');
+
+// 过滤 Node.js DEP0169: url.parse() DeprecationWarning（后台切换直播代理模式时会刷日志）
+process.on('warning', (warning) => {
+  try {
+    const msg = typeof warning?.message === 'string' ? warning.message : '';
+    if (warning?.code === 'DEP0169' || msg.includes('url.parse()')) {
+      return;
+    }
+  } catch {
+    // ignore
+  }
+  // 其他 warning 保持默认输出行为
+  // eslint-disable-next-line no-console
+  console.warn(warning);
+});
+
 const next = require('next');
 const { Server } = require('socket.io');
 const {
