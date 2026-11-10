@@ -19,6 +19,7 @@ import {
   GetBangumiCalendarData,
 } from '@/lib/bangumi.client';
 import { getDoubanCategories } from '@/lib/douban.client';
+import { takePrefetchedData } from '@/lib/route-prefetch';
 import { getTMDBImageUrl, TMDBItem } from '@/lib/tmdb.client';
 import { DoubanItem } from '@/lib/types';
 import { base58Encode, processImageUrl } from '@/lib/utils';
@@ -384,6 +385,7 @@ function HomeClient() {
   }, [announcement, announcementDisplayMode]);
 
   useEffect(() => {
+    (async () => {
     const CACHE_DURATION = 60 * 60 * 1000; // 1小时
 
     const getCache = (key: string) => {
@@ -422,47 +424,77 @@ function HomeClient() {
     if (duanjuCache?.data) setHotDuanju(duanjuCache.data);
     if (upcomingCache?.data) setUpcomingContent(upcomingCache.data);
 
-    const hasCache =
-      moviesCache ||
-      tvShowsCache ||
-      varietyCache ||
-      bangumiCache ||
-      duanjuCache ||
-      upcomingCache;
-    if (hasCache) setLoading(false);
+    // 导航预取命中：TopProgressBar 在点击进入首页的瞬间已并发拉取缺失数据，
+    // 这里直接消费结果（挂载即出数据，骨架消失），并标记已覆盖的 key 以跳过重复请求。
+    const prefetchedData = await takePrefetchedData('/');
+    if (prefetchedData) {
+      if (Array.isArray(prefetchedData.movies)) {
+        setHotMovies(prefetchedData.movies);
+        setCache('homepage_movies', prefetchedData.movies);
+      }
+      if (Array.isArray(prefetchedData.tv)) {
+        setHotTvShows(prefetchedData.tv);
+        setCache('homepage_tvshows', prefetchedData.tv);
+      }
+      if (Array.isArray(prefetchedData.variety)) {
+        setHotVarietyShows(prefetchedData.variety);
+        setCache('homepage_variety', prefetchedData.variety);
+      }
+      if (Array.isArray(prefetchedData.bangumi)) {
+        setBangumiCalendarData(prefetchedData.bangumi);
+        setCache('homepage_bangumi', prefetchedData.bangumi);
+      }
+      if (Array.isArray(prefetchedData.duanju)) {
+        setHotDuanju(prefetchedData.duanju);
+        setCache('homepage_duanju', prefetchedData.duanju);
+      }
+      if (Array.isArray(prefetchedData.upcoming)) {
+        setUpcomingContent(prefetchedData.upcoming);
+        setCache('homepage_upcoming', prefetchedData.upcoming);
+      }
+      setLoading(false);
+    } else {
+      const hasCache =
+        moviesCache ||
+        tvShowsCache ||
+        varietyCache ||
+        bangumiCache ||
+        duanjuCache ||
+        upcomingCache;
+      if (hasCache) setLoading(false);
 
-    const needsRefresh =
-      !moviesCache ||
-      moviesCache.expired ||
-      !tvShowsCache ||
-      tvShowsCache.expired ||
-      !varietyCache ||
-      varietyCache.expired ||
-      !bangumiCache ||
-      bangumiCache.expired ||
-      !duanjuCache ||
-      duanjuCache.expired ||
-      !upcomingCache ||
-      upcomingCache.expired;
+      const needsRefresh =
+        !moviesCache ||
+        moviesCache.expired ||
+        !tvShowsCache ||
+        tvShowsCache.expired ||
+        !varietyCache ||
+        varietyCache.expired ||
+        !bangumiCache ||
+        bangumiCache.expired ||
+        !duanjuCache ||
+        duanjuCache.expired ||
+        !upcomingCache ||
+        upcomingCache.expired;
 
-    if (needsRefresh) {
-      (async () => {
-        try {
-          const [
-            moviesData,
-            tvShowsData,
-            varietyShowsData,
-            bangumiCalendarData,
-          ] = await Promise.all([
-            getDoubanCategories({
-              kind: 'movie',
-              category: '热门',
-              type: '全部',
-            }).catch((error) => {
-              console.error('获取热门电影数据失败:', error);
-              return null;
-            }),
-            getDoubanCategories({
+      if (needsRefresh) {
+        (async () => {
+          try {
+            const [
+              moviesData,
+              tvShowsData,
+              varietyShowsData,
+              bangumiCalendarData,
+            ] = await Promise.all([
+              getDoubanCategories({
+                kind: 'movie',
+                category: '热门',
+                type: '全部',
+              }).catch((error) => {
+                console.error('获取热门电影数据失败:', error);
+                return null;
+              }),
+              getDoubanCategories({
               kind: 'tv',
               category: 'tv',
               type: 'tv',
@@ -556,7 +588,9 @@ function HomeClient() {
           setLoading(false);
         }
       })();
+      }
     }
+    })();
   }, []);
 
   const handleCloseAnnouncement = (announcement: string) => {
