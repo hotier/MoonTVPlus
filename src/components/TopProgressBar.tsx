@@ -4,6 +4,8 @@ import { usePathname, useRouter,useSearchParams } from 'next/navigation';
 import NProgress from 'nprogress';
 import { useEffect, useRef } from 'react';
 
+import { prefetchRoute } from '@/lib/route-prefetch';
+
 // 创建全局钩子来拦截 router
 let globalRouterRef: any = null;
 
@@ -42,6 +44,8 @@ export default function TopProgressBar() {
       if (currentPathname === '/play' || currentPathname === '/live' || targetPathname !== previousPathnameRef.current) {
         isNavigatingRef.current = true;
         NProgress.start();
+        // 数据预取：进度条阶段就发出目标页关键 API，页面挂载后无需再等 skeleton 阶段的请求
+        prefetchRoute(targetPathname);
       }
       return originalPush.apply(this, args);
     };
@@ -57,6 +61,7 @@ export default function TopProgressBar() {
       if (currentPathname === '/play' || currentPathname === '/live' || targetPathname !== previousPathnameRef.current) {
         isNavigatingRef.current = true;
         NProgress.start();
+        prefetchRoute(targetPathname);
       }
       return originalReplace.apply(this, args);
     };
@@ -92,6 +97,7 @@ export default function TopProgressBar() {
             if (currentOrigin === targetOrigin && targetPathname !== previousPathnameRef.current) {
               isNavigatingRef.current = true;
               NProgress.start();
+              prefetchRoute(targetPathname);
             }
           } catch (e) {
             // URL 解析失败，忽略
