@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { getAuthInfoFromCookie } from '@/lib/auth';
 import { clearConfigCache } from '@/lib/config';
+import { bumpLayoutCacheVersion } from '@/lib/layout-cache';
 
 export const runtime = 'nodejs';
 
@@ -33,6 +34,7 @@ export async function GET(request: NextRequest) {
 
   try {
     await clearConfigCache();
+    bumpLayoutCacheVersion();
 
     return NextResponse.json(
       { ok: true },

@@ -8,8 +8,8 @@ import './globals.css';
 
 import { parseAuthInfo } from '@/lib/auth';
 import { getConfig } from '@/lib/config';
+import { getLayoutData } from '@/lib/layout-cache';
 import { getUserFeatureAccess } from '@/lib/permissions';
-import { listEnabledSourceScripts } from '@/lib/source-script';
 
 import { StartupCacheCleanup } from '../components/DanmakuCacheCleanup';
 import { DownloadBubble } from '../components/DownloadBubble';
@@ -144,11 +144,11 @@ export default async function RootLayout({
   // 特殊源名单：供客户端按入口隔离收藏与播放记录。
   // 入口开关是本机 cookie，与存储模式无关，所以 localstorage 模式也要注入；
   // getConfig() 有模块级缓存，generateMetadata 里已经调过一次，这里不产生额外读取。
-  const specialSourceApis = (await getConfig()).SpecialSourceApis || [];
-  let userFeatureAccess =
-    storageType === 'localstorage'
-      ? await getUserFeatureAccess(process.env.USERNAME || 'localstorage-owner')
-      : await getUserFeatureAccess(null);
+  // 布局聚合数据走 layout-cache（60s 软 TTL + stale-while-revalidate）：
+  // 命中缓存时本次导航 0 次远程库访问，是路由切换提速的关键。
+  const layoutData = await getLayoutData();
+  const specialSourceApis = layoutData.config.SpecialSourceApis || [];
+  let userFeatureAccess = layoutData.userFeatureAccess;
   let customCategories = [] as {
     name: string;
     type: 'movie' | 'tv';
@@ -157,9 +157,10 @@ export default async function RootLayout({
   if (storageType !== 'localstorage') {
     const cookieStore = await cookies();
     const authInfo = parseAuthInfo(cookieStore.get('auth')?.value);
+    // 登录用户的功能权限按用户区分，单独读取（user-cache 有 6h TTL 保护）
     userFeatureAccess = await getUserFeatureAccess(authInfo?.username);
 
-    const config = await getConfig();
+    const config = layoutData.config;
     siteName = config.SiteConfig.SiteName;
     announcement = config.SiteConfig.Announcement;
     announcementDisplayMode =
@@ -259,9 +260,8 @@ export default async function RootLayout({
     // 电子书馆同时支持 OPDS 与 Legado。Legado 源通过订阅单独配置，
     // 不一定会出现在 OPDS Sources 中；入口应由“启用电子书馆”开关控制。
     booksEnabled = !!opdsConfig?.Enabled;
-    // 高级推荐功能配置：存在已启用视频源脚本时显示
-    advancedRecommendationEnabled =
-      (await listEnabledSourceScripts()).length > 0;
+    // 高级推荐功能配置：存在已启用视频源脚本时显示（layout-cache 已聚合，不再单独查库）
+    advancedRecommendationEnabled = layoutData.enabledSourceScripts.length > 0;
     // 检查是否启用了 OpenList 功能
     openListEnabled = !!(
       config.OpenListConfig?.Enabled &&
