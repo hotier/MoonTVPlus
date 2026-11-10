@@ -112,9 +112,13 @@ async function runMigrations(client) {
   // 但实际可能缺失后续关键表（如 music_v2_history），导致后续 ALTER TABLE 失败。
   // 因此这里直接从 schema_migrations 真实记录出发执行所有未标记迁移。
 
+  let musicV2HistoryExists = await tableExists(client, 'music_v2_history');
+
   for (const file of migrationFiles) {
     const applied = await getAppliedMigrations(client);
-    if (applied.has(file)) {
+
+    const shouldSkip = applied.has(file) && !(!musicV2HistoryExists && file === '005_music_v2.sql');
+    if (shouldSkip) {
       console.log(`⏭️  Migration already applied: ${file}`);
       continue;
     }
@@ -136,6 +140,9 @@ async function runMigrations(client) {
       }
     }
     await markMigrationApplied(client, file);
+    if (file === '005_music_v2.sql') {
+      musicV2HistoryExists = true;
+    }
     console.log(`✅ Migration applied: ${file}`);
   }
 }
