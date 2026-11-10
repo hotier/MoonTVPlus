@@ -9,6 +9,16 @@ import { refreshLiveChannels } from '@/lib/live';
 
 export const runtime = 'nodejs';
 
+// 过滤 Node DEP0169: url.parse() deprecation warning
+process.on('warning', (warning) => {
+  try {
+    const msg = typeof (warning as any)?.message === 'string' ? (warning as any).message : '';
+    if ((warning as any)?.code === 'DEP0169' || msg.includes('url.parse()')) return;
+  } catch {
+    // ignore
+  }
+});
+
 export const dynamic = 'force-dynamic';
 
 
