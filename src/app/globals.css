@@ -150,6 +150,30 @@ html:not(.dark) body {
   display: none; /* Chrome, Safari, Opera */
 }
 
+/* 后台管理页表格容器：超宽表格显示横向滚动条（上面全局隐藏滚动条的规则会吞掉它们） */
+[data-table] {
+  -ms-overflow-style: auto !important;
+  scrollbar-width: auto !important;
+}
+
+[data-table]::-webkit-scrollbar {
+  display: block !important;
+  height: 8px;
+}
+
+[data-table]::-webkit-scrollbar-thumb {
+  background: rgba(107, 114, 128, 0.45);
+  border-radius: 4px;
+}
+
+[data-table]::-webkit-scrollbar-thumb:hover {
+  background: rgba(107, 114, 128, 0.65);
+}
+
+[data-table]::-webkit-scrollbar-track {
+  background: rgba(31, 41, 55, 0.08);
+}
+
 /* View Transitions API 动画 */
 @keyframes slide-from-top {
   from {
