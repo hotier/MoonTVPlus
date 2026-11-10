@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { getConfig } from '@/lib/config';
 import { getDanmakuApiBaseUrl } from '@/lib/danmaku/config';
+import { cacheGet, cacheSet } from '@/lib/danmaku/server-cache';
 
 export const runtime = 'nodejs';
 
@@ -28,6 +29,12 @@ export async function GET(request: NextRequest) {
         },
         { status: 400 }
       );
+    }
+
+    const cacheKey = String(animeId);
+    const cached = cacheGet('episodes', cacheKey);
+    if (cached !== undefined) {
+      return NextResponse.json(cached);
     }
 
     // 从数据库读取弹幕配置
@@ -65,6 +72,10 @@ export async function GET(request: NextRequest) {
       }
 
       const data = await response.json();
+      // 只缓存成功且含分集的结果
+      if (data && data.success !== false && data.bangumi?.episodes?.length) {
+        cacheSet('episodes', cacheKey, data);
+      }
 
       return NextResponse.json(data);
     } catch (fetchError) {

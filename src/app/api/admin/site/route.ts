@@ -350,6 +350,14 @@ export async function POST(request: NextRequest) {
     // 写入数据库
     await db.saveAdminConfig(adminConfig);
 
+    // 弹幕服务配置可能变更（API 地址/Token），清空弹幕服务端缓存避免返回旧源数据
+    try {
+      const { cacheClear } = await import('@/lib/danmaku/server-cache');
+      cacheClear();
+    } catch {
+      /* ignore */
+    }
+
     return NextResponse.json(
       { ok: true },
       {
