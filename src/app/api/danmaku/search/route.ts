@@ -28,6 +28,9 @@ export async function GET(request: NextRequest) {
     const baseUrl = getDanmakuApiBaseUrl(config.SiteConfig);
 
     const apiUrl = `${baseUrl}/api/v2/search/anime?keyword=${encodeURIComponent(keyword)}`;
+    const token = config.SiteConfig.DanmakuApiToken;
+    const userAgent =
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36';
 
     // 添加超时控制
     const controller = new AbortController();
@@ -38,6 +41,10 @@ export async function GET(request: NextRequest) {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'User-Agent': userAgent,
+          'Authorization': token,
+          'X-API-Token': token,
         },
         signal: controller.signal,
         keepalive: true,

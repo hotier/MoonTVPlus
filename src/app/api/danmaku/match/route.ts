@@ -29,6 +29,9 @@ export async function POST(request: NextRequest) {
     const baseUrl = getDanmakuApiBaseUrl(config.SiteConfig);
 
     const apiUrl = `${baseUrl}/api/v2/match`;
+    const token = config.SiteConfig.DanmakuApiToken;
+    const userAgent =
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36';
 
     // 添加超时控制
     const controller = new AbortController();
@@ -39,6 +42,10 @@ export async function POST(request: NextRequest) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'User-Agent': userAgent,
+          'Authorization': token,
+          'X-API-Token': token,
         },
         body: JSON.stringify({ fileName }),
         signal: controller.signal,
