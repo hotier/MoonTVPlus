@@ -107,7 +107,10 @@ async function runMigrations(client) {
   const migrationFiles = getMigrationFiles();
   const hadExistingSchema = await tableExists(client, 'users');
   await ensureMigrationTable(client);
-  await seedExistingMigrationBaseline(client, migrationFiles, hadExistingSchema);
+  // NOTE: 不要基于“存在 users 表”来跳过历史迁移。
+  // 之前的逻辑会在 schema_migrations 为空时把前置迁移标记为已应用，
+  // 但实际可能缺失后续关键表（如 music_v2_history），导致后续 ALTER TABLE 失败。
+  // 因此这里直接从 schema_migrations 真实记录出发执行所有未标记迁移。
 
   for (const file of migrationFiles) {
     const applied = await getAppliedMigrations(client);
