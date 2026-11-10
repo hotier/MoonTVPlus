@@ -9,6 +9,7 @@ const path = require('path');
 const isCloudflare = process.env.CF_PAGES === '1' || process.env.BUILD_TARGET === 'cloudflare';
 const isEdgeOne = process.env.EDGEONE_PAGES === '1' || process.env.BUILD_TARGET === 'edgeone';
 const isEdgeBuild = isCloudflare || isEdgeOne;
+const isVercel = process.env.VERCEL === '1' || !!process.env.VERCEL_URL;
 
 const optimizedPackageImports = [
   '@dnd-kit/core',
@@ -25,7 +26,7 @@ const createNextConfig = (phase) => {
 
   const nextConfig = {
   // Cloudflare Pages 不支持 standalone，使用默认输出
-  output: isEdgeBuild ? undefined : 'standalone',
+  output: isEdgeBuild ? undefined : isVercel ? undefined : 'standalone',
   eslint: {
     dirs: ['src'],
     // 在生产构建时忽略 ESLint 错误
