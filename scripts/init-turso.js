@@ -105,29 +105,21 @@ async function seedExistingMigrationBaseline(
 
 async function runMigrations(client) {
   const migrationFiles = getMigrationFiles();
-  const hadExistingSchema = await tableExists(client, 'users');
-  await ensureMigrationTable(client);
-  // NOTE: 不要基于“存在 users 表”来跳过历史迁移。
-  // 之前的逻辑会在 schema_migrations 为空时把前置迁移标记为已应用，
-  // 但实际可能缺失后续关键表（如 music_v2_history），导致后续 ALTER TABLE 失败。
-  // 因此这里直接从 schema_migrations 真实记录出发执行所有未标记迁移。
 
-  let musicV2HistoryExists = await tableExists(client, 'music_v2_history');
+  await ensureMigrationTable(client);
+
+  // 关键修复点：不要依赖 schema_migrations 的“已应用”标记跳过迁移。
+  // 在 Vercel/Turso 这种可能出现“标记已存在但实际表缺失”的场景下，
+  // 后续 ALTER/UPDATE 会直接报 `no such table`。
+  // 这里把每个迁移按顺序执行（CREATE/索引等语句都用 IF NOT EXISTS），
+  // 对已存在/重复列等错误用 isIgnorableMigrationError 兜底，从而达到幂等初始化。
 
   for (const file of migrationFiles) {
-    const applied = await getAppliedMigrations(client);
-
-    const shouldSkip = applied.has(file) && !(!musicV2HistoryExists && file === '005_music_v2.sql');
-    if (shouldSkip) {
-      console.log(`⏭️  Migration already applied: ${file}`);
-      continue;
-    }
-
     const migrationPath = path.join(MIGRATIONS_DIR, file);
     const sql = fs.readFileSync(migrationPath, 'utf8');
     const statements = splitSqlStatements(sql);
 
-    console.log(`▶️  Applying migration: ${file}`);
+    console.log(`▶️  Applying migration (idempotent): ${file}`);
     for (const statement of statements) {
       try {
         await client.execute(statement);
@@ -139,10 +131,8 @@ async function runMigrations(client) {
         throw error;
       }
     }
+
     await markMigrationApplied(client, file);
-    if (file === '005_music_v2.sql') {
-      musicV2HistoryExists = true;
-    }
     console.log(`✅ Migration applied: ${file}`);
   }
 }
