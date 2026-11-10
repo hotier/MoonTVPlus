@@ -5,6 +5,9 @@ import { getQrLoginSession, saveQrLoginSession } from '@/lib/qr-login/store';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 export async function POST(request: NextRequest) {
   const { token } = await request.json();
   const session = await getQrLoginSession(token);

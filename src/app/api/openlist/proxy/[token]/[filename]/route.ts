@@ -17,6 +17,9 @@ import { hasFeaturePermission } from '@/lib/permissions';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 const OPENLIST_PLAY_UA =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36';
 

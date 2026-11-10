@@ -6,6 +6,9 @@ import { getAuthorizedBooksUsername } from '../../_utils';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 type SynthesizePayload = {
   sourceId?: string;
   bookId?: string;

@@ -15,6 +15,9 @@ import { badRequest, getMusicV2Username, internalError, unauthorized } from '@/l
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 function toHistoryRecord(
   input: any,
   previous: MusicV2HistoryRecord | undefined,

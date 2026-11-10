@@ -8,6 +8,9 @@ import { getTVEpisodeImages } from '@/lib/tmdb.search';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 /**
  * GET /api/tmdb/episode-images?id=xxx&season=xxx&episode=xxx
  * 获取电视剧某一集的剧照

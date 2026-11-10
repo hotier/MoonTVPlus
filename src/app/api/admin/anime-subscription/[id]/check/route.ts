@@ -8,6 +8,9 @@ import { db } from '@/lib/db';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 /**
  * POST /api/admin/anime-subscription/[id]/check
  * 手动触发检查单个订阅

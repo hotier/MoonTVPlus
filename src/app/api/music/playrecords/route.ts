@@ -10,6 +10,9 @@ import { getCachedSongs, setCachedSong } from '@/lib/music-song-cache';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 export async function GET(request: NextRequest) {
   try {
     const authResult = await requireFeaturePermission(request, 'music', '无权限访问音乐功能');

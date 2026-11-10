@@ -7,6 +7,9 @@ import { db } from '@/lib/db';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 const downloadTools = ['aria2', 'qBittorrent', 'Transmission'] as const;
 type DownloadTool = typeof downloadTools[number];
 

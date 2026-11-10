@@ -8,6 +8,9 @@ import { getTelegramConfig, sendTelegramMessage, setTelegramBotCommands, setTele
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 
 async function assertAdmin(request: NextRequest) {
   const authInfo = getAuthInfoFromCookie(request);

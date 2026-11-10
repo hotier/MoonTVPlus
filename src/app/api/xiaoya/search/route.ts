@@ -8,6 +8,9 @@ import { requireFeaturePermission } from '@/lib/permissions';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 /**
  * GET /api/xiaoya/search?keyword=<keyword>&type=<type>
  * 搜索小雅视频（使用小雅的网页搜索引擎）

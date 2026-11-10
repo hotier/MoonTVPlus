@@ -15,6 +15,9 @@ import { yellowWords } from '@/lib/yellow';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 /**
  * CMS 采集站代理接口
  * 用于代理 CMS API 请求，并自动将播放链接替换为带去广告的代理链接

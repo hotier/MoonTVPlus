@@ -11,6 +11,9 @@ import { resolveWebSearch } from '@/lib/web-search-config';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 // 根据 AIConfig 解析出评论生成实际使用的协议与凭据，
 // 与首页 AI 助手（/api/ai/chat）保持一致，兼容新版 AI 方式。
 function resolveAICredentials(aiConfig: any): {

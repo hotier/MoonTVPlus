@@ -3,6 +3,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getConfig } from '@/lib/config';
 import { getTMDBUpcomingContent } from '@/lib/tmdb.client';
 
+export const dynamic = 'force-dynamic';
+
+
 // 内存缓存对象
 interface CacheItem {
   data: any;

@@ -12,6 +12,9 @@ import { hasFeaturePermission } from '@/lib/permissions';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 /**
  * POST /api/acg/health
  * 单条磁力/种子 Tracker scrape 测活（动漫磁链搜索 / 网盘搜索磁力类型共用）

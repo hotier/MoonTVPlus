@@ -10,6 +10,9 @@ import { findUnknownSourceName } from '@/lib/openlist-sources';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 /**
  * PUT /api/admin/anime-subscription/[id]
  * 更新订阅

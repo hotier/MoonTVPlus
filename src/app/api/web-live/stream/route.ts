@@ -3,6 +3,9 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { requireFeaturePermission } from '@/lib/permissions';
 
+export const dynamic = 'force-dynamic';
+
+
 function getAntiCode(oldAntiCode: string, streamName: string): string {
   const paramsT = 100;
   const sdkVersion = 2403051612;

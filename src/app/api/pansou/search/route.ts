@@ -8,6 +8,9 @@ import { PansouLink, searchPansou } from '@/lib/pansou.client';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 // NetDiskConfig 平台键 -> pansou 网盘类型键
 const NETDISK_CONFIG_TO_CLOUD_TYPE: Record<string, string> = {
   Quark: 'quark',

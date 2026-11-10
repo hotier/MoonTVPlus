@@ -22,6 +22,9 @@ import { resolveWebSearch } from '@/lib/web-search-config';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 function normalizeClaudeBaseURL(baseURL: string): string {
   const normalized = baseURL.trim().replace(/\/+$/, '');
   return /\/v1$/i.test(normalized) ? normalized : `${normalized}/v1`;

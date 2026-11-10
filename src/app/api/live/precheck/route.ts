@@ -8,6 +8,9 @@ import { fetchLiveSource, getLiveSource } from '@/lib/tvbox-live.server';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 export async function GET(request: NextRequest) {
   const authResult = await requireFeaturePermission(
     request,

@@ -8,6 +8,9 @@ import { PlayRecord } from '@/lib/types';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 export async function GET(request: NextRequest) {
   try {
     // 从 cookie 获取用户信息

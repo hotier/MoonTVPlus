@@ -8,6 +8,9 @@ import { buildProxyStreamHeaders } from '@/lib/server/proxy-headers';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const url = searchParams.get('url');

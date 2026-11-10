@@ -28,6 +28,9 @@ import { SearchResult } from '@/lib/types';
 import { syncTVBoxLiveSources } from '@/lib/tvbox-live.server';
 
 export const runtime = 'nodejs';
+
+export const dynamic = 'force-dynamic';
+
 const MAX_INLINE_MANGA_COVERS = 3;
 const MAX_INLINE_MANGA_COVER_BYTES = 350 * 1024;
 const TARGET_INLINE_MANGA_COVER_WIDTH = 480;

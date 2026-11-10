@@ -5,6 +5,9 @@ import { badRequest, internalError } from '@/lib/music-v2-api';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 type HotSearchItem = { keyword: string; name: string; artist: string; source: string };
 type LxHotSearchPayload =
   | string[]

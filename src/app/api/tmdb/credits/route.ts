@@ -8,6 +8,9 @@ import { getTMDBCredits } from '@/lib/tmdb.client';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 /**
  * GET /api/tmdb/credits?id=xxx&type=movie|tv
  * 获取TMDB演职人员信息

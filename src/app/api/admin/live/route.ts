@@ -11,6 +11,9 @@ import { syncTVBoxLiveSources } from '@/lib/tvbox-live.server';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 export async function POST(request: NextRequest) {
   try {
     // 权限检查 - 使用v2用户系统

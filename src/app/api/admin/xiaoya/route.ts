@@ -10,6 +10,9 @@ import { XiaoyaClient } from '@/lib/xiaoya.client';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 /**
  * POST /api/admin/xiaoya
  * 管理小雅配置

@@ -11,6 +11,9 @@ import { validateLocalSettingsPayload } from '@/lib/local-settings-sync';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 // 存储类型：仅关系型（D1/Postgres/Turso/SQLite）与 Redis 系列支持云同步
 function isSyncStorageSupported(): boolean {
   const storageType = process.env.NEXT_PUBLIC_STORAGE_TYPE || 'localstorage';

@@ -8,6 +8,9 @@ import { getAuthorizedBooksUsername } from '../_utils';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 const imageCache = new Map<string, { expiresAt: number; contentType: string; data: Uint8Array }>();
 
 function asObjectHeader(value?: string | Record<string, string>): Record<string, string> {

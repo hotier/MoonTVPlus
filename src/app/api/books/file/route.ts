@@ -7,6 +7,9 @@ import { getAuthorizedBooksUsername } from '../_utils';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 type FilePayload = {
   sourceId?: string;
   bookId?: string;

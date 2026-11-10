@@ -6,6 +6,9 @@ import { fetchDoubanWithVerification } from '@/lib/douban-anti-crawler';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 interface DoubanRecommendation {
   doubanId: string;
   title: string;

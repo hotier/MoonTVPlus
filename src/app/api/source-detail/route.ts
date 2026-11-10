@@ -71,6 +71,9 @@ import { parseTVBoxBridgeSourceValue } from '@/lib/tvbox-bridge.shared';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 /**
  * 网盘集标题：保留完整文件名（去掉常见视频扩展名），
  * 供前端选集按钮长按/右键查看全名；按钮短标签仍由前端从文件名提取集数。

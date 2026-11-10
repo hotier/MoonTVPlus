@@ -14,6 +14,9 @@ import { isTVBoxBridgeSource } from '@/lib/tvbox-bridge.shared';
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 // 支持的操作类型
 type Action =
   | 'add'

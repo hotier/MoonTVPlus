@@ -8,6 +8,9 @@ import {
   searchTMDBMulti,
 } from '@/lib/tmdb.client';
 
+export const dynamic = 'force-dynamic';
+
+
 // 服务器端缓存（内存）
 const searchCache = new Map<
   string,

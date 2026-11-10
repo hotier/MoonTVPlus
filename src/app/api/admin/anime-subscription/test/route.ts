@@ -10,6 +10,9 @@ import {
 
 export const runtime = 'nodejs';
 
+export const dynamic = 'force-dynamic';
+
+
 /**
  * POST /api/admin/anime-subscription/test
  * 集数过滤测试：按表单参数实际搜索一次，返回关键词命中与集数提取结果
