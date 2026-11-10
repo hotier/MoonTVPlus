@@ -1,4 +1,6 @@
 {
+  "installCommand": "pnpm install --no-frozen-lockfile",
+  "buildCommand": "pnpm init:turso && pnpm build",
   "headers": [
     {
       "source": "/fonts/inter-var-latin.woff2",
