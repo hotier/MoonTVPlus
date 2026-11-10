@@ -6781,21 +6781,16 @@ function PlayPageClient() {
     console.log(`[弹幕选择] isManual=${isManual}, selection:`, selection);
     setCurrentDanmakuSelection(selection);
 
-    // 只有手动选择时才保存到 sessionStorage
-    if (isManual) {
-      const title = videoTitleRef.current;
-      const episodeIndex = currentEpisodeIndexRef.current;
-      if (title && episodeIndex >= 0) {
-        saveManualDanmakuSelection(title, episodeIndex, selection.episodeId);
-
-        // 保存用户手动选择的动漫ID（用于换集时自动匹配）
-        saveDanmakuAnimeId(title, selection.animeId);
-
-        // 保存搜索关键词（如果有的话）
-        if (selection.searchKeyword) {
-          saveDanmakuSearchKeyword(title, selection.searchKeyword);
-          console.log(`[弹幕记忆] 保存手动搜索关键词: ${selection.searchKeyword}`);
-        }
+    // 无论手动选择还是自动匹配，都持久化「标题 -> 动漫ID / 关键词 / 每集 episodeId」映射。
+    // 这样下次观看同一视频（含新开标签页/新会话）可直接命中映射，跳过慢速的
+    // 搜索(2~17s) + 分集列表(~8s) 两步，只需取弹幕内容。
+    const title = videoTitleRef.current;
+    const episodeIndex = currentEpisodeIndexRef.current;
+    if (title && episodeIndex >= 0) {
+      saveManualDanmakuSelection(title, episodeIndex, selection.episodeId);
+      saveDanmakuAnimeId(title, selection.animeId);
+      if (selection.searchKeyword) {
+        saveDanmakuSearchKeyword(title, selection.searchKeyword);
       }
     }
 

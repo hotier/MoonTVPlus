@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { getConfig } from '@/lib/config';
 import { getDanmakuApiBaseUrl } from '@/lib/danmaku/config';
+import { cacheGet, cacheSet } from '@/lib/danmaku/server-cache';
 
 export const runtime = 'nodejs';
 
@@ -52,6 +53,14 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // 服务端缓存：同一集的弹幕内容短时间内不会变（一集可能 6000+ 条、700KB），
+    // 首次聚合慢（~4s），命中后所有用户即时返回。
+    const cacheKey = episodeId ? `ep:${episodeId}` : `url:${url}`;
+    const cached = cacheGet('comment', cacheKey);
+    if (cached !== undefined) {
+      return NextResponse.json(cached);
+    }
+
     // 从数据库读取弹幕配置
     const config = await getConfig();
     const baseUrl = getDanmakuApiBaseUrl(config.SiteConfig);
@@ -99,10 +108,16 @@ export async function GET(request: NextRequest) {
       // 解析 XML 为 JSON
       const comments = parseXmlDanmaku(xmlText);
 
-      return NextResponse.json({
+      const payload = {
         count: comments.length,
         comments,
-      });
+      };
+      // 有弹幕才缓存（空结果可能是上游临时异常，不缓存以便稍后重试）
+      if (comments.length > 0) {
+        cacheSet('comment', cacheKey, payload);
+      }
+
+      return NextResponse.json(payload);
     } catch (fetchError) {
       clearTimeout(timeoutId);
 

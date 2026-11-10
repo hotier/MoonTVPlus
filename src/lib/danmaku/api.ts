@@ -51,10 +51,46 @@ export {
   getDanmakuFromCache,
 };
 
+// ---------------------------------------------------------------------------
+// 客户端短时缓存（localStorage）：搜索 / 分集列表
+// 上游首次聚合很慢（搜索 2~17s、分集 ~8s），同一关键词/动漫短时间内不会变，
+// 缓存后同会话/跨会话重复访问直接命中，避免每次播放都重新等待。
+// 服务端也有缓存兜底，这里是「连网络请求都省掉」的第二层。
+// ---------------------------------------------------------------------------
+const CLIENT_SEARCH_TTL = 30 * 60 * 1000; // 30 分钟
+const CLIENT_EPISODES_TTL = 6 * 60 * 60 * 1000; // 6 小时
+
+function readClientCache<T>(key: string, ttl: number): T | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return null;
+    const { data, ts } = JSON.parse(raw);
+    if (Date.now() - ts > ttl) return null;
+    return data as T;
+  } catch {
+    return null;
+  }
+}
+
+function writeClientCache(key: string, data: unknown): void {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(key, JSON.stringify({ data, ts: Date.now() }));
+  } catch {
+    // 超出容量等错误忽略
+  }
+}
+
 // 搜索动漫
 export async function searchAnime(
   keyword: string
 ): Promise<DanmakuSearchResponse> {
+  const cacheKey = `danmaku_search_v1_${keyword}`;
+  const cached = readClientCache<DanmakuSearchResponse>(cacheKey, CLIENT_SEARCH_TTL);
+  if (cached) {
+    return cached;
+  }
   try {
     const url = `/api/danmaku/search?keyword=${encodeURIComponent(keyword)}`;
     const response = await fetch(url);
@@ -64,6 +100,9 @@ export async function searchAnime(
     }
 
     const data = (await response.json()) as DanmakuSearchResponse;
+    if (data && data.success !== false && data.animes?.length) {
+      writeClientCache(cacheKey, data);
+    }
     return data;
   } catch (error) {
     console.error('搜索动漫失败:', error);
@@ -114,6 +153,14 @@ export async function matchAnime(
 export async function getEpisodes(
   animeId: number
 ): Promise<DanmakuEpisodesResponse> {
+  const cacheKey = `danmaku_episodes_v1_${animeId}`;
+  const cached = readClientCache<DanmakuEpisodesResponse>(
+    cacheKey,
+    CLIENT_EPISODES_TTL
+  );
+  if (cached) {
+    return cached;
+  }
   try {
     const url = `/api/danmaku/episodes?animeId=${animeId}`;
     const response = await fetch(url);
@@ -123,6 +170,9 @@ export async function getEpisodes(
     }
 
     const data = (await response.json()) as DanmakuEpisodesResponse;
+    if (data && data.success !== false && data.bangumi?.episodes?.length) {
+      writeClientCache(cacheKey, data);
+    }
     return data;
   } catch (error) {
     console.error('获取剧集列表失败:', error);

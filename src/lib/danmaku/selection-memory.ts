@@ -15,7 +15,7 @@ export function saveDanmakuSourceIndex(title: string, selectedIndex: number): vo
 
   try {
     const key = `${STORAGE_KEY_PREFIX}index_${title}`;
-    sessionStorage.setItem(key, selectedIndex.toString());
+    localStorage.setItem(key, selectedIndex.toString());
     console.log(`[弹幕记忆] 保存弹幕源下标: ${title} -> ${selectedIndex}`);
   } catch (error) {
     console.error('[弹幕记忆] 保存下标失败:', error);
@@ -32,7 +32,7 @@ export function getDanmakuSourceIndex(title: string): number | null {
 
   try {
     const key = `${STORAGE_KEY_PREFIX}index_${title}`;
-    const value = sessionStorage.getItem(key);
+    const value = localStorage.getItem(key);
 
     if (value !== null) {
       const index = parseInt(value, 10);
@@ -63,7 +63,7 @@ export function saveManualDanmakuSelection(
 
   try {
     const key = `${STORAGE_KEY_PREFIX}manual_${title}_${episodeIndex}`;
-    sessionStorage.setItem(key, episodeId.toString());
+    localStorage.setItem(key, episodeId.toString());
     console.log(`[弹幕记忆] 保存手动选择: ${title} 第${episodeIndex}集 -> ${episodeId}`);
   } catch (error) {
     console.error('[弹幕记忆] 保存手动选择失败:', error);
@@ -84,7 +84,7 @@ export function getManualDanmakuSelection(
 
   try {
     const key = `${STORAGE_KEY_PREFIX}manual_${title}_${episodeIndex}`;
-    const value = sessionStorage.getItem(key);
+    const value = localStorage.getItem(key);
 
     if (value !== null) {
       const episodeId = parseInt(value, 10);
@@ -110,18 +110,18 @@ export function clearDanmakuSelectionMemory(title: string): void {
   try {
     // 清除弹幕源下标记忆
     const indexKey = `${STORAGE_KEY_PREFIX}index_${title}`;
-    sessionStorage.removeItem(indexKey);
+    localStorage.removeItem(indexKey);
 
-    // 清除所有手动选择记忆（遍历所有 sessionStorage 键）
+    // 清除所有手动选择记忆（遍历所有 localStorage 键）
     const keysToRemove: string[] = [];
-    for (let i = 0; i < sessionStorage.length; i++) {
-      const key = sessionStorage.key(i);
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
       if (key && key.startsWith(`${STORAGE_KEY_PREFIX}manual_${title}_`)) {
         keysToRemove.push(key);
       }
     }
 
-    keysToRemove.forEach(key => sessionStorage.removeItem(key));
+    keysToRemove.forEach(key => localStorage.removeItem(key));
 
     console.log(`[弹幕记忆] 清除记忆: ${title}`);
   } catch (error) {
@@ -137,14 +137,14 @@ export function clearAllDanmakuSelectionMemory(): void {
 
   try {
     const keysToRemove: string[] = [];
-    for (let i = 0; i < sessionStorage.length; i++) {
-      const key = sessionStorage.key(i);
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
       if (key && key.startsWith(STORAGE_KEY_PREFIX)) {
         keysToRemove.push(key);
       }
     }
 
-    keysToRemove.forEach(key => sessionStorage.removeItem(key));
+    keysToRemove.forEach(key => localStorage.removeItem(key));
 
     console.log('[弹幕记忆] 清除所有记忆');
   } catch (error) {
@@ -162,7 +162,7 @@ export function saveDanmakuSearchKeyword(title: string, keyword: string): void {
 
   try {
     const key = `${STORAGE_KEY_PREFIX}keyword_${title}`;
-    sessionStorage.setItem(key, keyword);
+    localStorage.setItem(key, keyword);
     console.log(`[弹幕记忆] 保存搜索关键词: ${title} -> ${keyword}`);
   } catch (error) {
     console.error('[弹幕记忆] 保存搜索关键词失败:', error);
@@ -179,7 +179,7 @@ export function getDanmakuSearchKeyword(title: string): string | null {
 
   try {
     const key = `${STORAGE_KEY_PREFIX}keyword_${title}`;
-    const keyword = sessionStorage.getItem(key);
+    const keyword = localStorage.getItem(key);
 
     if (keyword) {
       console.log(`[弹幕记忆] 读取搜索关键词: ${title} -> ${keyword}`);
@@ -202,7 +202,7 @@ export function saveDanmakuAnimeId(title: string, animeId: number): void {
 
   try {
     const key = `${STORAGE_KEY_PREFIX}anime_${title}`;
-    sessionStorage.setItem(key, animeId.toString());
+    localStorage.setItem(key, animeId.toString());
     console.log(`[弹幕记忆] 保存动漫ID: ${title} -> ${animeId}`);
   } catch (error) {
     console.error('[弹幕记忆] 保存动漫ID失败:', error);
@@ -219,7 +219,7 @@ export function getDanmakuAnimeId(title: string): number | null {
 
   try {
     const key = `${STORAGE_KEY_PREFIX}anime_${title}`;
-    const value = sessionStorage.getItem(key);
+    const value = localStorage.getItem(key);
 
     if (value !== null) {
       const animeId = parseInt(value, 10);

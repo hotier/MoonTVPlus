@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { getConfig } from '@/lib/config';
 import { getDanmakuApiBaseUrl } from '@/lib/danmaku/config';
+import { cacheGet, cacheSet } from '@/lib/danmaku/server-cache';
 
 export const runtime = 'nodejs';
 
@@ -25,6 +26,12 @@ export async function POST(request: NextRequest) {
         },
         { status: 400 }
       );
+    }
+
+    const cacheKey = String(fileName);
+    const cached = cacheGet('match', cacheKey);
+    if (cached !== undefined) {
+      return NextResponse.json(cached);
     }
 
     // 从数据库读取弹幕配置
@@ -62,6 +69,9 @@ export async function POST(request: NextRequest) {
       }
 
       const data = await response.json();
+      if (data && data.success !== false) {
+        cacheSet('match', cacheKey, data);
+      }
 
       return NextResponse.json(data);
     } catch (fetchError) {
