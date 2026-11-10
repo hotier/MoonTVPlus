@@ -52,6 +52,10 @@ export async function GET(request: NextRequest) {
     // 从数据库读取弹幕配置
     const config = await getConfig();
     const baseUrl = getDanmakuApiBaseUrl(config.SiteConfig);
+    const token = config.SiteConfig.DanmakuApiToken;
+    const userAgent =
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36';
+
 
     let apiUrl: string;
 
@@ -72,6 +76,9 @@ export async function GET(request: NextRequest) {
         method: 'GET',
         headers: {
           'Accept': 'application/xml, text/xml',
+          'User-Agent': userAgent,
+          'Authorization': config.SiteConfig.DanmakuApiToken,
+          'X-API-Token': config.SiteConfig.DanmakuApiToken,
         },
         signal: controller.signal,
         keepalive: true,
