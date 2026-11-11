@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getConfig } from '@/lib/config';
 import { getDanmakuApiBaseUrl } from '@/lib/danmaku/config';
 import { cacheGet, cacheSet, dedupeAndLimit } from '@/lib/danmaku/server-cache';
+import { persistGet, persistSet } from '@/lib/danmaku/persist-cache';
 
 export const runtime = 'nodejs';
 
@@ -31,6 +32,12 @@ export async function GET(request: NextRequest) {
     const cached = cacheGet('search', cacheKey);
     if (cached !== undefined) {
       return NextResponse.json(cached);
+    }
+    // L2：数据库持久化缓存（跨实例/跨冷启动共享）
+    const persisted = await persistGet('search', cacheKey);
+    if (persisted !== undefined) {
+      cacheSet('search', cacheKey, persisted);
+      return NextResponse.json(persisted);
     }
 
     // 从数据库读取弹幕配置
@@ -73,6 +80,8 @@ export async function GET(request: NextRequest) {
       // 只缓存成功响应，避免把临时错误缓存住
       if (data && data.success !== false) {
         cacheSet('search', cacheKey, data);
+        // 落库（await 保证 serverless 响应返回前写完，否则后台 promise 可能被回收）
+        await persistSet('search', cacheKey, data);
       }
 
       return NextResponse.json(data);
