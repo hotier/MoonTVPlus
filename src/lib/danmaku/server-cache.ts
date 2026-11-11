@@ -137,3 +137,102 @@ export function cacheStats(): Record<string, number> {
     match: b.match.size,
   };
 }
+
+// ---------------------------------------------------------------------------
+// 上游请求「去重 + 并发限制」
+//
+// 自建 danmu_api 通常是小机器/单实例，多源聚合很吃 CPU 与上游连接。
+// 实测：同时对它发起几条新的搜索请求就能把实例打满，连根路径都要 hang 30s+。
+// 因此：
+//   1) 同一 cacheKey 的并发请求只打一次上游（in-flight 去重），其余等结果
+//   2) 全局限制同时打到上游的请求数（默认 4），避免把自建服务打崩
+// ---------------------------------------------------------------------------
+
+const INFLIGHT_KEY = Symbol.for('__MOONTV_DANMAKU_INFLIGHT__');
+const LIMITER_KEY = Symbol.for('__MOONTV_DANMAKU_LIMITER__');
+
+const MAX_UPSTREAM_CONCURRENCY = Number(
+  process.env.MOONTV_DANMAKU_UPSTREAM_CONCURRENCY || 4
+);
+
+interface LimiterState {
+  active: number;
+  waiters: Array<() => void>;
+}
+
+function limiter(): LimiterState {
+  const g = globalThis as any;
+  if (!g[LIMITER_KEY]) {
+    g[LIMITER_KEY] = { active: 0, waiters: [] } as LimiterState;
+  }
+  return g[LIMITER_KEY] as LimiterState;
+}
+
+function inflightMap(): Map<string, Promise<unknown>> {
+  const g = globalThis as any;
+  if (!g[INFLIGHT_KEY]) {
+    g[INFLIGHT_KEY] = new Map<string, Promise<unknown>>();
+  }
+  return g[INFLIGHT_KEY] as Map<string, Promise<unknown>>;
+}
+
+async function acquire(): Promise<void> {
+  const l = limiter();
+  if (l.active < MAX_UPSTREAM_CONCURRENCY) {
+    l.active++;
+    return;
+  }
+  await new Promise<void>((resolve) => l.waiters.push(resolve));
+  l.active++;
+}
+
+function release(): void {
+  const l = limiter();
+  l.active = Math.max(0, l.active - 1);
+  const next = l.waiters.shift();
+  if (next) next();
+}
+
+/**
+ * 去重 + 限流地执行一次上游请求。
+ * @param dedupeKey 唯一标识（建议 `${kind}:${key}`）
+ * @param fn 真正的上游请求逻辑
+ */
+export async function dedupeAndLimit<T>(
+  dedupeKey: string,
+  fn: () => Promise<T>
+): Promise<T> {
+  const existing = inflightMap().get(dedupeKey);
+  if (existing) {
+    return existing as Promise<T>;
+  }
+  const p = (async () => {
+    await acquire();
+    try {
+      return await fn();
+    } finally {
+      release();
+    }
+  })();
+  inflightMap().set(dedupeKey, p as Promise<unknown>);
+  try {
+    return await p;
+  } finally {
+    inflightMap().delete(dedupeKey);
+  }
+}
+
+export function getDanmakuUpstreamLimitInfo(): {
+  maxConcurrency: number;
+  active: number;
+  queued: number;
+  inflightKeys: number;
+} {
+  const l = limiter();
+  return {
+    maxConcurrency: MAX_UPSTREAM_CONCURRENCY,
+    active: l.active,
+    queued: l.waiters.length,
+    inflightKeys: inflightMap().size,
+  };
+}

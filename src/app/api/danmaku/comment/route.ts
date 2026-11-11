@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { getConfig } from '@/lib/config';
 import { getDanmakuApiBaseUrl } from '@/lib/danmaku/config';
-import { cacheGet, cacheSet } from '@/lib/danmaku/server-cache';
+import { cacheGet, cacheSet, dedupeAndLimit } from '@/lib/danmaku/server-cache';
 
 export const runtime = 'nodejs';
 
@@ -84,36 +84,39 @@ export async function GET(request: NextRequest) {
     const timeoutId = setTimeout(() => controller.abort(), 120000); // 2分钟超时
 
     try {
-      const response = await fetch(apiUrl, {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/xml, text/xml',
-          'User-Agent': userAgent,
-          'Authorization': config.SiteConfig.DanmakuApiToken,
-          'X-API-Token': config.SiteConfig.DanmakuApiToken,
-        },
-        signal: controller.signal,
-        keepalive: true,
+      const payload = await dedupeAndLimit(`comment:${cacheKey}`, async () => {
+        const response = await fetch(apiUrl, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/xml, text/xml',
+            'User-Agent': userAgent,
+            'Authorization': config.SiteConfig.DanmakuApiToken,
+            'X-API-Token': config.SiteConfig.DanmakuApiToken,
+          },
+          signal: controller.signal,
+          keepalive: true,
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        // 获取 XML 文本
+        const xmlText = await response.text();
+
+        // 解析 XML 为 JSON
+        const comments = parseXmlDanmaku(xmlText);
+
+        return {
+          count: comments.length,
+          comments,
+        };
       });
 
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      // 获取 XML 文本
-      const xmlText = await response.text();
-
-      // 解析 XML 为 JSON
-      const comments = parseXmlDanmaku(xmlText);
-
-      const payload = {
-        count: comments.length,
-        comments,
-      };
       // 有弹幕才缓存（空结果可能是上游临时异常，不缓存以便稍后重试）
-      if (comments.length > 0) {
+      if (payload.comments.length > 0) {
         cacheSet('comment', cacheKey, payload);
       }
 
