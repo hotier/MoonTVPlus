@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { getConfig } from '@/lib/config';
 import { getDanmakuApiBaseUrl } from '@/lib/danmaku/config';
-import { cacheGet, cacheSet } from '@/lib/danmaku/server-cache';
+import { cacheGet, cacheSet, dedupeAndLimit } from '@/lib/danmaku/server-cache';
 
 export const runtime = 'nodejs';
 
@@ -51,27 +51,30 @@ export async function GET(request: NextRequest) {
     const timeoutId = setTimeout(() => controller.abort(), 30000); // 10秒超时
 
     try {
-      const response = await fetch(apiUrl, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'User-Agent': userAgent,
-          'Authorization': token,
-          'X-API-Token': token,
-        },
-        signal: controller.signal,
-        // 添加 keepalive 避免连接被重置
-        keepalive: true,
+      const data = await dedupeAndLimit(`episodes:${cacheKey}`, async () => {
+        const response = await fetch(apiUrl, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'User-Agent': userAgent,
+            'Authorization': token,
+            'X-API-Token': token,
+          },
+          signal: controller.signal,
+          // 添加 keepalive 避免连接被重置
+          keepalive: true,
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        return (await response.json()) as any;
       });
 
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
       // 只缓存成功且含分集的结果
       if (data && data.success !== false && data.bangumi?.episodes?.length) {
         cacheSet('episodes', cacheKey, data);
