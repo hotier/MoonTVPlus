@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { getConfig } from '@/lib/config';
 import { getDanmakuApiBaseUrl } from '@/lib/danmaku/config';
-import { cacheGet, cacheSet, dedupeAndLimit } from '@/lib/danmaku/server-cache';
+import { cacheGet, cacheSet, dedupeAndLimit, getDanmakuCacheScope } from '@/lib/danmaku/server-cache';
 
 export const runtime = 'nodejs';
 
@@ -53,20 +53,25 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // 服务端缓存：同一集的弹幕内容短时间内不会变（一集可能 6000+ 条、700KB），
-    // 首次聚合慢（~4s），命中后所有用户即时返回。
-    const cacheKey = episodeId ? `ep:${episodeId}` : `url:${url}`;
-    const cached = cacheGet('comment', cacheKey);
-    if (cached !== undefined) {
-      return NextResponse.json(cached);
-    }
-
-    // 从数据库读取弹幕配置
+    // 从数据库读取弹幕配置（模块级缓存，开销极小）
     const config = await getConfig();
     const baseUrl = getDanmakuApiBaseUrl(config.SiteConfig);
     const token = config.SiteConfig.DanmakuApiToken;
     const userAgent =
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36';
+
+    // 服务端缓存：同一集的弹幕内容短时间内不会变（一集可能 6000+ 条、700KB），
+    // 首次聚合慢（~4s），命中后所有用户即时返回。
+    // key 带缓存 scope（版本号+源指纹），换弹幕服务后旧缓存自动失效。
+    const scope = getDanmakuCacheScope(
+      config.SiteConfig.DanmakuApiBase || '',
+      token || ''
+    );
+    const cacheKey = `${scope}|${episodeId ? `ep:${episodeId}` : `url:${url}`}`;
+    const cached = cacheGet('comment', cacheKey);
+    if (cached !== undefined) {
+      return NextResponse.json(cached);
+    }
 
 
     let apiUrl: string;

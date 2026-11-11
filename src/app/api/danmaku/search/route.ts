@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { getConfig } from '@/lib/config';
 import { getDanmakuApiBaseUrl } from '@/lib/danmaku/config';
-import { cacheGet, cacheSet, dedupeAndLimit } from '@/lib/danmaku/server-cache';
+import { cacheGet, cacheSet, dedupeAndLimit, getDanmakuCacheScope } from '@/lib/danmaku/server-cache';
 import { persistGet, persistSet } from '@/lib/danmaku/persist-cache';
 
 export const runtime = 'nodejs';
@@ -28,7 +28,16 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const cacheKey = keyword.trim();
+    // 先读配置（模块级缓存，开销极小），用于计算缓存 scope（换源自动失效）
+    const config = await getConfig();
+    const baseUrl = getDanmakuApiBaseUrl(config.SiteConfig);
+    const token = config.SiteConfig.DanmakuApiToken;
+    const scope = getDanmakuCacheScope(
+      config.SiteConfig.DanmakuApiBase || '',
+      token || ''
+    );
+    const cacheKey = `${scope}|${keyword.trim()}`;
+
     const cached = cacheGet('search', cacheKey);
     if (cached !== undefined) {
       return NextResponse.json(cached);
@@ -40,12 +49,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(persisted);
     }
 
-    // 从数据库读取弹幕配置
-    const config = await getConfig();
-    const baseUrl = getDanmakuApiBaseUrl(config.SiteConfig);
-
     const apiUrl = `${baseUrl}/api/v2/search/anime?keyword=${encodeURIComponent(keyword)}`;
-    const token = config.SiteConfig.DanmakuApiToken;
     const userAgent =
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36';
 

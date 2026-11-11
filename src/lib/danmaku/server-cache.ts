@@ -236,3 +236,35 @@ export function getDanmakuUpstreamLimitInfo(): {
     inflightKeys: inflightMap().size,
   };
 }
+
+// ---------------------------------------------------------------------------
+// 缓存「版本号 / 作用域」
+//
+// 目的：换弹幕服务（地址或 Token）后，旧数据必须立刻失效，不能继续返回旧源的内容。
+// 做法：把「版本号 + 源地址 + Token」哈希成一个 scope 前缀，拼进缓存 key。
+//   - 换源 → scope 变 → 旧 key 自动不可达（L1 内存 + L2 数据库都失效）
+//   - 想手动强制全站刷新（比如上游补了新集）→ 改环境变量 MOONTV_DANMAKU_CACHE_VERSION
+//     （+1 或任意新值）再重新部署即可，一行搞定，无需清库
+// 零额外成本：scope 只由当前配置和 env 计算，不读数据库。
+// ---------------------------------------------------------------------------
+function fnv1a(str: string): string {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < str.length; i++) {
+    h ^= str.charCodeAt(i);
+    h = (h * 0x01000193) >>> 0;
+  }
+  return (h >>> 0).toString(36);
+}
+
+export function getDanmakuCacheVersion(): string {
+  return (process.env.MOONTV_DANMAKU_CACHE_VERSION || '1').trim() || '1';
+}
+
+/**
+ * 计算弹幕缓存的 scope 前缀（含人工版本号 + 源地址 + Token 指纹）。
+ * 所有缓存 key 都应以前缀 `${scope}|` 开头。
+ */
+export function getDanmakuCacheScope(baseUrl: string, token: string): string {
+  const version = getDanmakuCacheVersion();
+  return `${version}-${fnv1a(`${version}|${baseUrl}|${token}`)}`;
+}
