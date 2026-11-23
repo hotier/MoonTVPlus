@@ -487,6 +487,39 @@ export async function getConfig(): Promise<AdminConfig> {
         // 数据库中确实没有配置，首次初始化并保存
         console.log('首次初始化配置');
         adminConfig = await getInitConfig('');
+        // 防护：若空配置初始化，尝试从 global_config.duanju 恢复已有视频源，
+        // 避免重部署/重建 admin_config 时把 SourceConfig 覆盖成空数组导致源丢失。
+        try {
+          const duanjuRaw = await db.getGlobalValue('duanju');
+          if (duanjuRaw && adminConfig.SourceConfig.length === 0) {
+            const duanjuSources = JSON.parse(duanjuRaw) as Array<{
+              key: string;
+              name?: string;
+              api?: string;
+            }>;
+            if (Array.isArray(duanjuSources) && duanjuSources.length > 0) {
+              adminConfig.SourceConfig = duanjuSources
+                .filter((s) => s && s.key && s.api)
+                .map((s) => ({
+                  key: s.key,
+                  name: s.name || s.key,
+                  api: s.api as string,
+                  detail: s.name || s.key,
+                  from: 'config' as const,
+                  disabled: false,
+                  weight: 0,
+                }));
+              adminConfig.VideoSourceOrder = adminConfig.SourceConfig.map(
+                (s) => s.key
+              );
+              console.log(
+                `[Config] 首次初始化：从 duanju 恢复 ${adminConfig.SourceConfig.length} 个视频源`
+              );
+            }
+          }
+        } catch (recoverErr) {
+          console.warn('[Config] 从 duanju 恢复源失败（不影响启动）:', recoverErr);
+        }
         await db.saveAdminConfig(adminConfig);
       }
     }
